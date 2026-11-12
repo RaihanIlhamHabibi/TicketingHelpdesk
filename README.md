@@ -14,15 +14,15 @@ docker compose up --build
 - API: http://localhost:8080/api
 - PostgreSQL: port internal `5432`
 
-Compose menyediakan kredensial seed dan secret **khusus untuk pengembangan lokal** agar aplikasi dapat langsung dicoba. Untuk mengubahnya, salin `.env.example` menjadi `.env` lalu ganti nilainya sebelum menjalankan `docker compose up --build`. Jangan gunakan default lokal pada deployment. Migrasi dan seed dijalankan oleh backend saat startup.
+Sebelum menjalankan Compose, salin `.env.example` menjadi `.env` dan ganti **semua** nilai placeholder dengan nilai unik. Compose akan menolak startup bila variabel wajib belum diisi; file `.env` tidak masuk Git. Password database harus URL-safe (huruf, angka, underscore) karena digunakan dalam `DATABASE_URL`. Gunakan secret dan password berbeda di setiap environment. Migrasi dan seed dijalankan oleh backend saat startup. Password seed hanya dipakai ketika akun seed pertama kali dibuat.
 
 ### Akun seed lokal
 
 | Peran | Email | Password lokal |
 |---|---|---|
-| Requester | `requester@example.com` | `Requester123!` |
-| Agent | `agent@example.com` | `Agent123!` |
-| Admin | `admin@example.com` | `Admin123!` |
+| Requester | `requester@example.com` | Nilai `SEED_REQUESTER_PASSWORD` di `.env` |
+| Agent | `agent@example.com` | Nilai `SEED_AGENT_PASSWORD` di `.env` |
+| Admin | `admin@example.com` | Nilai `SEED_ADMIN_PASSWORD` di `.env` |
 
 Semua password seed dapat diubah lewat variabel `SEED_*_PASSWORD`.
 
