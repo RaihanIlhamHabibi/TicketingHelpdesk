@@ -10,11 +10,12 @@ Pastikan Docker dan Docker Compose tersedia, lalu dari root project jalankan:
 docker compose up --build
 ```
 
-- UI: http://localhost:8081
-- API: http://localhost:8080/api
+- UI: http://localhost:8081 by default (`FRONTEND_PORT`)
+- API: http://localhost:8080/api by default (`API_PORT`)
 - PostgreSQL: port internal `5432`
 
 Sebelum menjalankan Compose, salin `.env.example` menjadi `.env` (`Copy-Item .env.example .env` di PowerShell atau `cp .env.example .env` di shell POSIX) dan ganti **semua** nilai placeholder dengan nilai unik. Compose akan menolak startup bila variabel wajib belum diisi; file `.env` tidak masuk Git. Password database harus URL-safe (huruf, angka, underscore) karena digunakan dalam `DATABASE_URL`. Gunakan secret dan password berbeda di setiap environment. Migrasi dan seed dijalankan oleh backend saat startup. Password seed hanya dipakai ketika akun seed pertama kali dibuat.
+Jika port `8080` atau `8081` sudah digunakan, ubah `API_PORT` atau `FRONTEND_PORT` di `.env`.
 
 ### Akun seed lokal
 
