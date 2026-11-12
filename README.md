@@ -85,4 +85,7 @@ CI tersedia melalui GitHub Actions dan menjalankan `go test ./...` serta `npm ru
 - Frontend menggunakan Vue Router untuk guard rute, Pinia untuk sesi pengguna, dan satu HTTP client untuk autentikasi/penanganan 401.
 - Migrasi idempotent diterapkan saat backend mulai; Docker Compose menunggu database sehat sebelum menjalankan API.
 - Upload lampiran, notifikasi real-time, SLA, dan statistik tidak termasuk implementasi. Penghapusan tiket dibatasi untuk admin dan requester pemilik tiket yang masih `open`; komentar terhapus melalui foreign-key cascade. Jika dilanjutkan, prioritas berikutnya adalah integrasi test berbasis database, rate limiting untuk autentikasi, dan observabilitas.
-# TicketingHelpdesk
+
+## Catatan pengumpulan
+
+Implementasi awal dipublikasikan dalam satu commit besar (`dec9c14`), lalu perbaikan berikutnya dicatat pada commit terpisah (`5b3aa8e`). Riwayat sebelum implementasi bukan catatan tahapan pengembangan aplikasi, dan tidak dibuat ulang atau direkayasa. Mohon tinjau source code, test, dan commit perbaikan yang tersedia sebagai hasil akhir.
