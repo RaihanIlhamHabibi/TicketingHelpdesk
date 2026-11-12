@@ -82,3 +82,4 @@ npm run build
 - Frontend menggunakan Vue Router untuk guard rute, Pinia untuk sesi pengguna, dan satu HTTP client untuk autentikasi/penanganan 401.
 - Migrasi idempotent diterapkan saat backend mulai; Docker Compose menunggu database sehat sebelum menjalankan API.
 - Upload lampiran, notifikasi real-time, SLA, statistik, dan pipeline CI tidak termasuk implementasi inti. Jika dilanjutkan, prioritas berikutnya adalah integrasi test berbasis database, rate limiting untuk autentikasi, dan observabilitas.
+# TicketingHelpdesk
