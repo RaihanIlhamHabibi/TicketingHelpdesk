@@ -43,6 +43,30 @@ func TestRequesterCanAccessOnlyOwnedTickets(t *testing.T) {
 	}
 }
 
+func TestTicketDeletionPermissions(t *testing.T) {
+	openTicket := Ticket{RequesterID: 7, Status: "open"}
+	resolvedTicket := Ticket{RequesterID: 7, Status: "resolved"}
+	cases := []struct {
+		name   string
+		user   User
+		ticket Ticket
+		want   bool
+	}{
+		{"owner deletes open ticket", User{ID: 7, Role: Requester}, openTicket, true},
+		{"owner cannot delete resolved ticket", User{ID: 7, Role: Requester}, resolvedTicket, false},
+		{"other requester cannot delete ticket", User{ID: 8, Role: Requester}, openTicket, false},
+		{"agent cannot delete ticket", User{ID: 9, Role: Agent}, openTicket, false},
+		{"admin deletes any ticket", User{ID: 9, Role: Admin}, resolvedTicket, true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := CanDeleteTicket(tc.user, tc.ticket); got != tc.want {
+				t.Fatalf("CanDeleteTicket() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestStaffCanAccessAnyTicket(t *testing.T) {
 	ticket := Ticket{RequesterID: 7}
 	for _, role := range []Role{Agent, Admin} {

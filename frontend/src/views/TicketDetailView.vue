@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, ArrowUpRight, MessageSquare, Plus, Send, ShieldCheck } from 'lucide-vue-next'
+import { ArrowLeft, ArrowUpRight, MessageSquare, Plus, Send, ShieldCheck, Trash2 } from 'lucide-vue-next'
 import { api } from '../api/http'
 import { useAuthStore } from '../stores/auth'
 import StatusBadge from '../components/StatusBadge.vue'
@@ -11,6 +11,8 @@ const router = useRouter()
 const auth = useAuthStore()
 const creating = computed(() => route.meta.create)
 const canManage = computed(() => ['agent', 'admin'].includes(auth.user?.role))
+const canDelete = computed(() => auth.user?.role === 'admin' ||
+  auth.user?.role === 'requester' && ticket.value?.requesterId === auth.user?.id && ticket.value?.status === 'open')
 const statusActions = computed(() => {
   const status = ticket.value?.status
   const role = auth.user?.role
@@ -104,6 +106,20 @@ async function addComment() {
   finally { saving.value = false }
 }
 
+async function removeTicket() {
+  if (!window.confirm('Delete this ticket and its comments? This cannot be undone.')) return
+  saving.value = true
+  error.value = ''
+  try {
+    await api.deleteTicket(ticket.value.id)
+    router.replace('/tickets')
+  } catch (e) {
+    error.value = e.message
+  } finally {
+    saving.value = false
+  }
+}
+
 function formatDate(value, withTime = false) {
   if (!value) return ''
   return new Intl.DateTimeFormat(undefined, withTime ? { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' } : { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value))
@@ -140,7 +156,7 @@ function requesterName() {
     <div v-else-if="busy" class="loading-state standalone"><span class="spinner"></span>Loading ticket…</div>
     <div v-else-if="error && !ticket" class="panel detail-error"><div class="alert error-alert">{{ error }}</div><button class="button button-secondary" @click="load">Try again</button></div>
     <template v-else-if="ticket">
-      <div class="detail-title-row"><div><div class="ticket-id">TICKET #{{ ticket.id }}</div><h1>{{ ticket.title }}</h1><p class="detail-meta">Created {{ formatDate(ticket.createdAt) }} <span>·</span> {{ ticket.category || 'General' }}</p></div><StatusBadge :value="ticket.status" /></div>
+      <div class="detail-title-row"><div><div class="ticket-id">TICKET #{{ ticket.id }}</div><h1>{{ ticket.title }}</h1><p class="detail-meta">Created {{ formatDate(ticket.createdAt) }} <span>·</span> {{ ticket.category || 'General' }}</p></div><div class="detail-actions"><button v-if="canDelete" class="button button-danger button-small" :disabled="saving" @click="removeTicket"><Trash2 :size="15" />Delete</button><StatusBadge :value="ticket.status" /></div></div>
       <div v-if="error" class="alert error-alert page-alert">{{ error }}</div>
       <div v-if="notice" class="alert success-alert page-alert">{{ notice }}</div>
       <div class="detail-layout">

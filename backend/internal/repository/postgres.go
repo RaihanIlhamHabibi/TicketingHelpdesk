@@ -185,6 +185,16 @@ func (p *Postgres) UpdateTicket(ctx context.Context, t domain.Ticket) (domain.Ti
 		t.ID, t.Title, t.Description, t.Category, t.Priority, t.Status, t.AssigneeID))
 }
 
+func (p *Postgres) DeleteTicket(ctx context.Context, id int64, actor domain.User) (bool, error) {
+	tag, err := p.DB.Exec(ctx, `DELETE FROM tickets WHERE id=$1 AND
+		($2='admin' OR ($2='requester' AND requester_id=$3 AND status='open'))`,
+		id, actor.Role, actor.ID)
+	if err != nil {
+		return false, err
+	}
+	return tag.RowsAffected() == 1, nil
+}
+
 func (p *Postgres) Comments(ctx context.Context, ticketID int64, includeInternal bool) ([]domain.Comment, error) {
 	rows, err := p.DB.Query(ctx, `SELECT c.id,c.ticket_id,c.author_id,u.name,c.body,c.is_internal,c.created_at
 		FROM comments c JOIN users u ON u.id=c.author_id

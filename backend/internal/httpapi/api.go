@@ -32,6 +32,7 @@ func (a *API) Handler() http.Handler {
 	mux.Handle("POST /api/tickets", a.auth(http.HandlerFunc(a.createTicket)))
 	mux.Handle("GET /api/tickets/{id}", a.auth(http.HandlerFunc(a.ticketDetail)))
 	mux.Handle("PATCH /api/tickets/{id}", a.auth(http.HandlerFunc(a.updateTicket)))
+	mux.Handle("DELETE /api/tickets/{id}", a.auth(http.HandlerFunc(a.deleteTicket)))
 	mux.Handle("POST /api/tickets/{id}/comments", a.auth(http.HandlerFunc(a.addComment)))
 	mux.Handle("GET /api/users", a.auth(http.HandlerFunc(a.listUsers)))
 	mux.Handle("GET /api/agents", a.auth(http.HandlerFunc(a.listAgents)))
@@ -200,6 +201,18 @@ func (a *API) ticketDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ticket": t, "comments": comments})
+}
+
+func (a *API) deleteTicket(w http.ResponseWriter, r *http.Request) {
+	id, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	if err := a.service.DeleteTicket(r.Context(), userFrom(r), id); err != nil {
+		a.fail(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (a *API) updateTicket(w http.ResponseWriter, r *http.Request) {

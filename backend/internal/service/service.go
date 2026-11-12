@@ -37,6 +37,7 @@ type Store interface {
 	ListTickets(context.Context, repository.TicketFilter) ([]domain.Ticket, int, error)
 	TicketByID(context.Context, int64) (domain.Ticket, error)
 	UpdateTicket(context.Context, domain.Ticket) (domain.Ticket, error)
+	DeleteTicket(context.Context, int64, domain.User) (bool, error)
 	Comments(context.Context, int64, bool) ([]domain.Comment, error)
 	CreateComment(context.Context, int64, int64, string, bool) (domain.Comment, error)
 }
@@ -202,6 +203,32 @@ func (s *Service) TicketDetail(ctx context.Context, actor domain.User, id int64)
 	}
 	comments, err := s.store.Comments(ctx, id, domain.CanViewInternalComments(actor))
 	return t, comments, err
+}
+
+func (s *Service) DeleteTicket(ctx context.Context, actor domain.User, id int64) error {
+	ticket, err := s.store.TicketByID(ctx, id)
+	if repository.IsNotFound(err) {
+		return ErrNotFound
+	}
+	if err != nil {
+		return err
+	}
+	if !domain.CanDeleteTicket(actor, ticket) {
+		return ErrForbidden
+	}
+	deleted, err := s.store.DeleteTicket(ctx, id, actor)
+	if err != nil {
+		return err
+	}
+	if deleted {
+		return nil
+	}
+	if _, err := s.store.TicketByID(ctx, id); repository.IsNotFound(err) {
+		return ErrNotFound
+	} else if err != nil {
+		return err
+	}
+	return fmt.Errorf("%w: ticket changed; refresh and try again", ErrConflict)
 }
 
 func (s *Service) UpdateTicket(ctx context.Context, actor domain.User, id int64, patch TicketPatch, provided map[string]bool) (domain.Ticket, error) {

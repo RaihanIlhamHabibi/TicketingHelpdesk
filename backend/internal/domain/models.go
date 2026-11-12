@@ -73,4 +73,8 @@ func CanAccessTicket(user User, ticket Ticket) bool {
 	return IsStaff(user.Role) || user.Role == Requester && user.ID == ticket.RequesterID
 }
 
+func CanDeleteTicket(user User, ticket Ticket) bool {
+	return user.Role == Admin || user.Role == Requester && user.ID == ticket.RequesterID && ticket.Status == "open"
+}
+
 func CanViewInternalComments(user User) bool { return IsStaff(user.Role) }

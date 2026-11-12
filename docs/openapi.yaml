@@ -115,6 +115,16 @@ paths:
         "400": { description: Invalid transition or input }
         "403": { description: Not permitted }
         "404": { description: Ticket not found }
+    delete:
+      tags: [Tickets]
+      summary: Delete a ticket
+      description: Admins can delete any ticket. Requesters can delete only their own tickets while status is open. Agents cannot delete tickets.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "204": { description: Ticket and its comments deleted }
+        "403": { description: Not permitted to delete this ticket }
+        "404": { description: Ticket not found }
+        "409": { description: Ticket changed during deletion }
   /api/tickets/{id}/comments:
     post:
       tags: [Tickets]

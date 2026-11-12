@@ -54,6 +54,7 @@ export const api = {
   createTicket: (ticket) => request('/tickets', { method: 'POST', body: JSON.stringify(ticket) }),
   ticket: (id) => request(`/tickets/${encodeURIComponent(id)}`),
   updateTicket: (id, changes) => request(`/tickets/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(changes) }),
+  deleteTicket: (id) => request(`/tickets/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   addComment: (id, comment) => request(`/tickets/${encodeURIComponent(id)}/comments`, { method: 'POST', body: JSON.stringify(comment) }),
   users: () => request('/users'),
   agents: () => request('/agents'),
